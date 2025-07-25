@@ -1,0 +1,86 @@
+local library = loadstring(game:HttpGetAsync("https://raw.githubusercontent.com/ShaddowScripts/Main/main/Library"))()
+
+-- Configurações
+local MainWindow = library:CreateWindow("Luar Hub", "Crimson")
+local speedBoostActive = false
+local speedBoostValue = 36
+local originalSpeed = 16
+local autoSpinActive = false
+
+-- Abas
+local MainTab = MainWindow:CreateTab("Main")
+local OthersTab = MainWindow:CreateTab("Others")
+local CreditsTab = MainWindow:CreateTab("Credits")
+
+--- ✅ LISTA COMPLETA DE OVOS ---
+local allEggs = {
+    "Chicken Egg", "Crow Egg", "Turtle Egg",
+    "Crab Egg", "Duck Egg", "Red Parrot Egg",
+    "Billy Egg", "Monkey Egg", "Horse Egg",
+    "Penguin Egg", "Storm Snake Egg", "Wild Snake Egg",
+    "Stegosaurus Egg", "Gastonia Egg", "Elephant Egg",
+    "Alligator Egg", "Blossom Fly Egg", "Leafjaw Egg",
+    "Mammoth Egg", "Crocodile Egg", "Sea Monster Egg",
+    "Wild Shark Egg", "Dragon Egg", "Orchidra Egg",
+    "Venom Dragon Egg", "Dreadmaw Egg"
+}
+
+-- Sistema de seleção de ovos
+local selectedEgg = allEggs[1]
+MainTab:CreateDropdown("Select Egg", allEggs, function(value)
+    selectedEgg = value
+end)
+
+-- Botão de compra
+MainTab:CreateButton("Purchase Egg", function()
+    game:GetService("ReplicatedStorage").Remotes.PurchaseEggFunc:InvokeServer(selectedEgg)
+end)
+
+-- Botão de venda
+MainTab:CreateButton("Sell Inventory", function()
+    game:GetService("ReplicatedStorage").Remotes.SellInventoryFunc:InvokeServer()
+end)
+
+--- ✅ ABA OTHERS ---
+-- Botão C. Rewards (primeiro)
+OthersTab:CreateButton("C. Rewards", function()
+    for i = 1, 7 do
+        game:GetService("ReplicatedStorage").Remotes.TimeRewardFunc:InvokeServer(i)
+        task.wait(0.3)
+    end
+end)
+
+-- SpeedBoost (segundo)
+OthersTab:CreateButton("SpeedBoost", function()
+    speedBoostActive = not speedBoostActive
+    if speedBoostActive then
+        coroutine.wrap(function()
+            while speedBoostActive and task.wait(0.1) do
+                local humanoid = game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character:FindFirstChildOfClass("Humanoid")
+                if humanoid then
+                    humanoid.WalkSpeed = originalSpeed + speedBoostValue
+                end
+            end
+            -- Reset ao desligar
+            local humanoid = game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character:FindFirstChildOfClass("Humanoid")
+            if humanoid then humanoid.WalkSpeed = originalSpeed end
+        end)()
+    end
+end)
+
+-- Auto Spin (ÚLTIMO, como solicitado)
+OthersTab:CreateToggle("Auto Spin", function(state)
+    autoSpinActive = state
+    if autoSpinActive then
+        coroutine.wrap(function()
+            while autoSpinActive and task.wait(0.5) do
+                game:GetService("ReplicatedStorage").Events.SpinRequest:FireServer()
+            end
+        end)()
+    end
+end)
+
+-- Créditos (sem ação)
+CreditsTab:CreateButton("Credits: Vouxy", function() end)
+
+MainTab:Show()
