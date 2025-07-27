@@ -1,0 +1,354 @@
+-- Luar Hub - Advanced Player System (SpeedWalk Loop, AntiVoid Button, Updated Large Part)
+local success, Fluent = pcall(function()
+    return loadstring(game:HttpGet("https://github.com/dawid-scripts/Fluent/releases/latest/download/main.lua"))()
+end)
+
+if not success then
+    warn("Failed to load Fluent library")
+    return
+end
+
+-- Load Addons
+local SaveManager = loadstring(game:HttpGet("https://raw.githubusercontent.com/dawid-scripts/Fluent/master/Addons/SaveManager.lua"))()
+local InterfaceManager = loadstring(game:HttpGet("https://raw.githubusercontent.com/dawid-scripts/Fluent/master/Addons/InterfaceManager.lua"))()
+
+-- Services
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local UserInputService = game:GetService("UserInputService")
+local TweenService = game:GetService("TweenService")
+local Lighting = game:GetService("Lighting")
+
+local LocalPlayer = Players.LocalPlayer
+local Options = Fluent.Options
+
+-- Global Variables
+local Settings = {
+    NoClip = { Enabled = false, Connection = nil },
+    Speed = { Enabled = false, Value = 16 },
+    Jump = { Enabled = false, Value = 50 },
+    InfiniteJump = { Enabled = false, Connection = nil },
+    AntiVoid = { Enabled = false, Part = nil },
+    FPSUnlock = { Enabled = false }
+}
+
+-- Utility Functions
+local function safeDestroy(instance)
+    if instance then
+        pcall(function() instance:Destroy() end)
+    end
+end
+
+-- SpeedWalk Loop
+spawn(function()
+    while true do
+        if LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("Humanoid") then
+            local humanoid = LocalPlayer.Character.Humanoid
+            humanoid.WalkSpeed = Settings.Speed.Enabled and Settings.Speed.Value or 16
+        end
+        task.wait(0.1) -- Loop every 0.1 seconds
+    end
+end)
+
+-- Window Creation
+local Window = Fluent:CreateWindow({
+    Title = "Luar Hub",
+    SubTitle = "By Vouxy",
+    TabWidth = 160,
+    Size = UDim2.fromOffset(600, 480),
+    Acrylic = true,
+    Theme = "Dark",
+    MinimizeKey = Enum.KeyCode.LeftControl
+})
+
+-- Tabs
+local Tabs = {
+    Main = Window:AddTab({ Title = "Main", Icon = "home" }),
+    Player = Window:AddTab({ Title = "Player", Icon = "user" }),
+    Visual = Window:AddTab({ Title = "Visual", Icon = "eye" }),
+    Others = Window:AddTab({ Title = "Others", Icon = "wrench" }),
+    Credits = Window:AddTab({ Title = "Credits", Icon = "info" }),
+    Settings = Window:AddTab({ Title = "Settings", Icon = "settings" })
+}
+
+-- Create Large Part at Specified Coordinates
+local largePart = Instance.new("Part")
+largePart.Name = "LuarPlatform"
+largePart.Size = Vector3.new(10000, 21, 10000) -- Updated height to 21
+largePart.Position = Vector3.new(-280.4, 30.2, -36.5)
+largePart.Anchored = true
+largePart.CanCollide = true
+largePart.Transparency = 1
+largePart.BrickColor = BrickColor.new("Institutional white")
+largePart.Material = Enum.Material.SmoothPlastic
+largePart.Parent = workspace
+
+-- Main Tab
+do
+    local AntiVoidButton = Tabs.Main:AddButton({
+        Title = "AntiVoid",
+        Callback = function()
+            Settings.AntiVoid.Enabled = not Settings.AntiVoid.Enabled
+            if Settings.AntiVoid.Enabled then
+                if not Settings.AntiVoid.Part then
+                    Settings.AntiVoid.Part = Instance.new("Part")
+                    Settings.AntiVoid.Part.Name = "AntiVoidPart"
+                    Settings.AntiVoid.Part.Size = Vector3.new(2048, 1, 2048)
+                    Settings.AntiVoid.Part.Position = Vector3.new(0, -50, 0)
+                    Settings.AntiVoid.Part.Anchored = true
+                    Settings.AntiVoid.Part.CanCollide = true
+                    Settings.AntiVoid.Part.Transparency = 0.5
+                    Settings.AntiVoid.Part.BrickColor = BrickColor.new("Bright green")
+                    Settings.AntiVoid.Part.Material = Enum.Material.Neon
+                    Settings.AntiVoid.Part.Parent = workspace
+                end
+            else
+                safeDestroy(Settings.AntiVoid.Part)
+                Settings.AntiVoid.Part = nil
+            end
+        end
+    })
+    
+    Tabs.Main:AddParagraph({
+        Title = "Update Notice",
+        Content = "New features will be added in future updates."
+    })
+end
+
+-- Player Tab
+do
+    local function applyPlayerSettings()
+        if LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("Humanoid") then
+            local humanoid = LocalPlayer.Character.Humanoid
+            humanoid.JumpPower = Settings.Jump.Enabled and Settings.Jump.Value or 50
+            humanoid.UseJumpPower = true
+        end
+    end
+
+    local SpeedToggle = Tabs.Player:AddToggle("SpeedToggle", {
+        Title = "Enable Speed",
+        Default = false
+    })
+
+    SpeedToggle:OnChanged(function()
+        Settings.Speed.Enabled = Options.SpeedToggle.Value
+    end)
+
+    local SpeedSlider = Tabs.Player:AddSlider("WalkSpeed", {
+        Title = "Walk Speed",
+        Default = 16,
+        Min = 16,
+        Max = 300,
+        Rounding = 1,
+        Callback = function(value)
+            Settings.Speed.Value = value
+        end
+    })
+
+    local JumpToggle = Tabs.Player:AddToggle("JumpToggle", {
+        Title = "Enable Jump Power",
+        Default = false
+    })
+
+    JumpToggle:OnChanged(function()
+        Settings.Jump.Enabled = Options.JumpToggle.Value
+        applyPlayerSettings()
+    end)
+
+    local JumpSlider = Tabs.Player:AddSlider("JumpPower", {
+        Title = "Jump Power",
+        Default = 50,
+        Min = 50,
+        Max = 300,
+        Rounding = 1,
+        Callback = function(value)
+            Settings.Jump.Value = value
+            applyPlayerSettings()
+        end
+    })
+
+    local InfiniteJumpToggle = Tabs.Player:AddToggle("InfiniteJump", {
+        Title = "Infinite Jump",
+        Default = false
+    })
+
+    InfiniteJumpToggle:OnChanged(function()
+        Settings.InfiniteJump.Enabled = Options.InfiniteJump.Value
+        
+        if Settings.InfiniteJump.Connection then
+            Settings.InfiniteJump.Connection:Disconnect()
+            Settings.InfiniteJump.Connection = nil
+        end
+        
+        if Settings.InfiniteJump.Enabled then
+            Settings.InfiniteJump.Connection = UserInputService.JumpRequest:Connect(function()
+                if Settings.InfiniteJump.Enabled and LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("Humanoid") then
+                    LocalPlayer.Character.Humanoid:ChangeState(Enum.HumanoidStateType.Jumping)
+                end
+            end)
+        end
+    end)
+
+    local NoClipToggle = Tabs.Player:AddToggle("NoClip", {
+        Title = "Noclip",
+        Default = false
+    })
+
+    NoClipToggle:OnChanged(function()
+        Settings.NoClip.Enabled = Options.NoClip.Value
+        
+        if Settings.NoClip.Connection then
+            Settings.NoClip.Connection:Disconnect()
+            Settings.NoClip.Connection = nil
+        end
+        
+        if Settings.NoClip.Enabled then
+            Settings.NoClip.Connection = RunService.Stepped:Connect(function()
+                if Settings.NoClip.Enabled and LocalPlayer.Character then
+                    for _, part in pairs(LocalPlayer.Character:GetChildren()) do
+                        if part:IsA("BasePart") then
+                            part.CanCollide = false
+                        end
+                    end
+                end
+            end)
+        end
+    end)
+
+    LocalPlayer.CharacterAdded:Connect(function(character)
+        character:WaitForChild("Humanoid")
+        task.wait(0.5)
+        applyPlayerSettings()
+    end)
+end
+
+-- Visual Tab
+do
+    Tabs.Visual:AddButton({
+        Title = "Fullbright",
+        Callback = function()
+            Lighting.Brightness = 2
+            Lighting.ClockTime = 12
+            Lighting.FogEnd = 1000000
+            Lighting.GlobalShadows = false
+            Lighting.OutdoorAmbient = Color3.fromRGB(150, 150, 150)
+        end
+    })
+
+    Tabs.Visual:AddButton({
+        Title = "Remove Textures",
+        Callback = function()
+            for _, obj in pairs(workspace:GetDescendants()) do
+                if obj:IsA("Decal") or obj:IsA("Texture") then
+                    obj.Transparency = 1
+                elseif obj:IsA("BasePart") then
+                    obj.Material = Enum.Material.SmoothPlastic
+                end
+            end
+        end
+    })
+
+    Tabs.Visual:AddButton({
+        Title = "Reset Lighting",
+        Callback = function()
+            Lighting:ClearAllChildren()
+            Lighting.Brightness = 1
+            Lighting.ClockTime = 14
+            Lighting.FogEnd = 100000
+            Lighting.GlobalShadows = true
+            Lighting.OutdoorAmbient = Color3.fromRGB(100, 100, 100)
+        end
+    })
+end
+
+-- Others Tab
+do
+    Tabs.Others:AddButton({
+        Title = "Infinite Yield",
+        Callback = function()
+            pcall(loadstring(game:HttpGet('https://raw.githubusercontent.com/EdgeIY/infiniteyield/master/source')))
+        end
+    })
+
+    local FPSToggle = Tabs.Others:AddToggle("FPSUnlock", {
+        Title = "FPS Unlocker",
+        Default = false
+    })
+
+    FPSToggle:OnChanged(function()
+        Settings.FPSUnlock.Enabled = Options.FPSUnlock.Value
+        if setfpscap then
+            setfpscap(Settings.FPSUnlock.Enabled and 1000 or 60)
+        end
+    end)
+end
+
+-- Credits Tab
+do
+    Tabs.Credits:AddParagraph({
+        Title = "Credits",
+        Content = "ScriptBlox: Vouxy\nDiscord: shiergy\nGithub: CodyDevil"
+    })
+end
+
+-- Anti-Kick and Maintenance
+spawn(function()
+    local success, err = pcall(function()
+        local mt = getrawmetatable(game)
+        local oldnamecall = mt.__namecall
+        setreadonly(mt, false)
+        
+        mt.__namecall = newcclosure(function(self, ...)
+            local method = getnamecallmethod()
+            if method == "Kick" or method == "kick" then
+                return
+            end
+            return oldnamecall(self, ...)
+        end)
+        
+        setreadonly(mt, true)
+    end)
+    
+    if not success then
+        warn("Anti-kick failed:", err)
+    end
+    
+    pcall(function()
+        settings().Network.IncomingReplicationLag = 0
+        settings().Physics.PhysicsEnvironmentalThrottle = Enum.EnviromentalPhysicsThrottle.Disabled
+    end)
+    
+    while not Fluent.Unloaded do
+        if LocalPlayer.Character then
+            local humanoid = LocalPlayer.Character:FindFirstChild("Humanoid")
+            if humanoid then
+                humanoid.PlatformStand = false
+                humanoid.JumpPower = Settings.Jump.Enabled and Settings.Jump.Value or 50
+                humanoid.UseJumpPower = true
+            end
+        end
+        task.wait(1)
+    end
+end)
+
+-- Initialize Save/Interface Systems
+SaveManager:SetLibrary(Fluent)
+InterfaceManager:SetLibrary(Fluent)
+SaveManager:IgnoreThemeSettings()
+SaveManager:SetIgnoreIndexes({})
+InterfaceManager:SetFolder("LuarHub")
+SaveManager:SetFolder("LuarHub/configs")
+
+InterfaceManager:BuildInterfaceSection(Tabs.Settings)
+SaveManager:BuildConfigSection(Tabs.Settings)
+
+Window:SelectTab(1)
+
+SaveManager:LoadAutoloadConfig()
+
+-- Keep Script Alive
+task.spawn(function()
+    while not Fluent.Unloaded do
+        task.wait(1)
+    end
+end)
