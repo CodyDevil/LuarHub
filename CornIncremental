@@ -1,0 +1,225 @@
+local Fluent = loadstring(game:HttpGet("https://github.com/dawid-scripts/Fluent/releases/latest/download/main.lua"))()
+local SaveManager = loadstring(game:HttpGet("https://raw.githubusercontent.com/dawid-scripts/Fluent/master/Addons/SaveManager.lua"))()
+local InterfaceManager = loadstring(game:HttpGet("https://raw.githubusercontent.com/dawid-scripts/Fluent/master/Addons/InterfaceManager.lua"))()
+
+local Window = Fluent:CreateWindow({
+    Title = "Luar Hub",
+    SubTitle = "By Vouxy",
+    TabWidth = 160,
+    Size = UDim2.fromOffset(580, 460),
+    Acrylic = true,
+    Theme = "Darker",
+    MinimizeKey = Enum.KeyCode.LeftControl
+})
+
+-- Creating tabs
+local Tabs = {
+    Main = Window:AddTab({ Title = "Main", Icon = "home" }),
+    Player = Window:AddTab({ Title = "Player", Icon = "user" }),
+    Credits = Window:AddTab({ Title = "Credits", Icon = "info" }),
+    Settings = Window:AddTab({ Title = "Settings", Icon = "settings" })
+}
+
+local Options = Fluent.Options
+
+-- Variables to control loops
+local autoCollectRunning = false
+local loopUpgradeRunning = false
+local autoRebirthRunning = false
+
+-- Main Tab
+do
+    -- Warning paragraph
+    Tabs.Main:AddParagraph({
+        Title = "Warning",
+        Content = "Irresponsible use of Auto Collect may result in account ban. Use at your own risk."
+    })
+
+    local AutoCollectToggle = Tabs.Main:AddToggle("AutoCollectToggle", {
+        Title = "Auto Collect",
+        Default = false
+    })
+
+    local LoopSpeedSlider = Tabs.Main:AddSlider("LoopSpeedSlider", {
+        Title = "Loop Speed",
+        Default = 0.005,
+        Min = 0.001,
+        Max = 1,
+        Rounding = 3
+    })
+
+    AutoCollectToggle:OnChanged(function()
+        autoCollectRunning = Options.AutoCollectToggle.Value
+        
+        if autoCollectRunning then
+            task.spawn(function()
+                while autoCollectRunning do
+                    local args = {
+                        [1] = "RubyCorn"
+                    }
+                    game:GetService("ReplicatedStorage"):WaitForChild("CollectCornEvent"):FireServer(unpack(args))
+                    wait(Options.LoopSpeedSlider.Value)
+                end
+            end)
+        end
+    end)
+
+    local AutoRebirthToggle = Tabs.Main:AddToggle("AutoRebirthToggle", {
+        Title = "Auto Rebirth",
+        Default = false
+    })
+
+    AutoRebirthToggle:OnChanged(function()
+        autoRebirthRunning = Options.AutoRebirthToggle.Value
+        
+        if autoRebirthRunning then
+            task.spawn(function()
+                while autoRebirthRunning do
+                    game:GetService("ReplicatedStorage"):WaitForChild("RebirthEvent"):FireServer()
+                    wait(1) -- 1 second delay for rebirth
+                end
+            end)
+        end
+    end)
+
+    local UpgradeDropdown = Tabs.Main:AddDropdown("UpgradeDropdown", {
+        Title = "Select Corn Upgrades",
+        Values = {"Corn Value", "Corn Amount", "Growth Rate"},
+        Multi = false,
+        Default = 1,
+    })
+
+    local LoopUpgradeToggle = Tabs.Main:AddToggle("LoopUpgradeToggle", {
+        Title = "Loop Upgrade",
+        Default = false
+    })
+
+    LoopUpgradeToggle:OnChanged(function()
+        loopUpgradeRunning = Options.LoopUpgradeToggle.Value
+        
+        if loopUpgradeRunning then
+            task.spawn(function()
+                while loopUpgradeRunning do
+                    local selectedUpgrade = Options.UpgradeDropdown.Value
+                    
+                    if selectedUpgrade == "Corn Value" then
+                        game:GetService("ReplicatedStorage"):WaitForChild("UpgradeCornValueUpg1RequestMax"):FireServer()
+                    elseif selectedUpgrade == "Corn Amount" then
+                        game:GetService("ReplicatedStorage"):WaitForChild("UpgradeCornAmountUpg1RequestMax"):FireServer()
+                    elseif selectedUpgrade == "Growth Rate" then
+                        game:GetService("ReplicatedStorage"):WaitForChild("UpgradeSpawnRateUpg1RequestMax"):FireServer()
+                    end
+                    
+                    wait(0.1) -- Small delay between upgrades
+                end
+            end)
+        end
+    end)
+end
+
+-- Player Tab
+do
+    local Players = game:GetService("Players")
+    local LocalPlayer = Players.LocalPlayer
+    local RunService = game:GetService("RunService")
+    local UserInputService = game:GetService("UserInputService")
+    
+    local infiniteJumpEnabled = false
+    local jumpConnection
+
+    local SpeedSlider = Tabs.Player:AddSlider("SpeedSlider", {
+        Title = "Speed Walk",
+        Description = "Adjust walking speed",
+        Default = 16,
+        Min = 16,
+        Max = 100,
+        Rounding = 1
+    })
+
+    local speedLoop = false
+
+    SpeedSlider:OnChanged(function()
+        speedLoop = true
+        task.spawn(function()
+            while speedLoop and LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("Humanoid") do
+                LocalPlayer.Character.Humanoid.WalkSpeed = Options.SpeedSlider.Value
+                wait(0.1)
+                if not speedLoop then break end
+            end
+        end)
+    end)
+
+
+
+    local InfiniteJumpToggle = Tabs.Player:AddToggle("InfiniteJumpToggle", {
+        Title = "Infinite Jump",
+        Default = false
+    })
+
+    InfiniteJumpToggle:OnChanged(function()
+        infiniteJumpEnabled = Options.InfiniteJumpToggle.Value
+        
+        if infiniteJumpEnabled then
+            jumpConnection = UserInputService.JumpRequest:Connect(function()
+                if LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("Humanoid") then
+                    LocalPlayer.Character.Humanoid:ChangeState("Jumping")
+                end
+            end)
+        else
+            if jumpConnection then
+                jumpConnection:Disconnect()
+                jumpConnection = nil
+            end
+        end
+    end)
+
+    -- Update player stats when character spawns
+    local function onCharacterAdded(character)
+        local humanoid = character:WaitForChild("Humanoid")
+        wait(0.5) -- Wait for character to fully load
+        humanoid.WalkSpeed = Options.SpeedSlider.Value
+        
+        -- Restart loop for new character
+        speedLoop = true
+        
+        task.spawn(function()
+            while speedLoop and character and character:FindFirstChild("Humanoid") do
+                character.Humanoid.WalkSpeed = Options.SpeedSlider.Value
+                wait(0.1)
+            end
+        end)
+    end
+
+    if LocalPlayer.Character then
+        onCharacterAdded(LocalPlayer.Character)
+    end
+
+    LocalPlayer.CharacterAdded:Connect(onCharacterAdded)
+end
+
+-- Credits Tab
+do
+    Tabs.Credits:AddParagraph({
+        Title = "Credits",
+        Content = "ScriptBlox: Vouxy\nDiscord: shiergy\nGithub: CodyDevil"
+    })
+end
+
+-- Manager configuration
+SaveManager:SetLibrary(Fluent)
+InterfaceManager:SetLibrary(Fluent)
+
+SaveManager:IgnoreThemeSettings()
+SaveManager:SetIgnoreIndexes({})
+
+InterfaceManager:SetFolder("LuarHub")
+SaveManager:SetFolder("LuarHub/configs")
+
+InterfaceManager:BuildInterfaceSection(Tabs.Settings)
+SaveManager:BuildConfigSection(Tabs.Settings)
+
+-- Select first tab
+Window:SelectTab(1)
+
+-- Load auto config
+SaveManager:LoadAutoloadConfig()
