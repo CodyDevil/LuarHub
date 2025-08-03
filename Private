@@ -1,0 +1,424 @@
+local player = game.Players.LocalPlayer
+local mouse = player:GetMouse()
+local UserInputService = game:GetService("UserInputService")
+local TweenService = game:GetService("TweenService")
+
+local screenGui = Instance.new("ScreenGui")
+screenGui.Parent = player:WaitForChild("PlayerGui")
+
+local mainFrame = Instance.new("Frame")
+mainFrame.Size = UDim2.new(0, 300, 0, 300)
+mainFrame.Position = UDim2.new(0.5, -150, 0.5, -150)
+mainFrame.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+mainFrame.BorderSizePixel = 0
+mainFrame.Parent = screenGui
+
+local uicorner = Instance.new("UICorner")
+uicorner.CornerRadius = UDim.new(0, 10)
+uicorner.Parent = mainFrame
+
+local title = Instance.new("TextLabel")
+title.Size = UDim2.new(1, 0, 0, 40)
+title.BackgroundTransparency = 1
+title.Text = "Luar Creating"
+title.TextColor3 = Color3.fromRGB(255, 255, 255)
+title.TextSize = 20
+title.Font = Enum.Font.SourceSansBold
+title.Parent = mainFrame
+
+local closeButton = Instance.new("TextButton")
+closeButton.Size = UDim2.new(0, 30, 0, 30)
+closeButton.Position = UDim2.new(1, -40, 0, 5)
+closeButton.BackgroundTransparency = 1
+closeButton.Text = "X"
+closeButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+closeButton.Parent = mainFrame
+
+local uicornerClose = Instance.new("UICorner")
+uicornerClose.CornerRadius = UDim.new(0, 5)
+uicornerClose.Parent = closeButton
+
+-- Tab 1 Buttons
+local infiniteYieldButton = Instance.new("TextButton")
+infiniteYieldButton.Size = UDim2.new(1, -20, 0, 40)
+infiniteYieldButton.Position = UDim2.new(0, 10, 0, 50)
+infiniteYieldButton.BackgroundColor3 = Color3.fromRGB(0, 120, 255)
+infiniteYieldButton.Text = "Infinite Yield"
+infiniteYieldButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+infiniteYieldButton.Parent = mainFrame
+
+local uicornerIY = Instance.new("UICorner")
+uicornerIY.CornerRadius = UDim.new(0, 10)
+uicornerIY.Parent = infiniteYieldButton
+
+local simpleSpyButton = Instance.new("TextButton")
+simpleSpyButton.Size = UDim2.new(1, -20, 0, 40)
+simpleSpyButton.Position = UDim2.new(0, 10, 0, 100)
+simpleSpyButton.BackgroundColor3 = Color3.fromRGB(0, 120, 255)
+simpleSpyButton.Text = "Simple Spy"
+simpleSpyButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+simpleSpyButton.Parent = mainFrame
+
+local uicornerSS = Instance.new("UICorner")
+uicornerSS.CornerRadius = UDim.new(0, 10)
+uicornerSS.Parent = simpleSpyButton
+
+local coordenadasToggle = Instance.new("TextButton")
+coordenadasToggle.Size = UDim2.new(1, -20, 0, 40)
+coordenadasToggle.Position = UDim2.new(0, 10, 0, 150)
+coordenadasToggle.BackgroundColor3 = Color3.fromRGB(100, 100, 100)
+coordenadasToggle.Text = "Coordenadas"
+coordenadasToggle.TextColor3 = Color3.fromRGB(255, 255, 255)
+coordenadasToggle.Parent = mainFrame
+
+local uicornerCoordToggle = Instance.new("UICorner")
+uicornerCoordToggle.CornerRadius = UDim.new(0, 10)
+uicornerCoordToggle.Parent = coordenadasToggle
+
+-- Tab 2 Buttons
+local remoteFinderButton = Instance.new("TextButton")
+remoteFinderButton.Size = UDim2.new(1, -20, 0, 40)
+remoteFinderButton.Position = UDim2.new(0, 10, 0, 50)
+remoteFinderButton.BackgroundColor3 = Color3.fromRGB(0, 120, 255)
+remoteFinderButton.Text = "Remote Finder"
+remoteFinderButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+remoteFinderButton.Parent = mainFrame
+remoteFinderButton.Visible = false
+
+local uicornerRF = Instance.new("UICorner")
+uicornerRF.CornerRadius = UDim.new(0, 10)
+uicornerRF.Parent = remoteFinderButton
+
+local dexExplorerButton = Instance.new("TextButton")
+dexExplorerButton.Size = UDim2.new(1, -20, 0, 40)
+dexExplorerButton.Position = UDim2.new(0, 10, 0, 100)
+dexExplorerButton.BackgroundColor3 = Color3.fromRGB(0, 120, 255)
+dexExplorerButton.Text = "Dex Explorer"
+dexExplorerButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+dexExplorerButton.Parent = mainFrame
+dexExplorerButton.Visible = false
+
+local uicornerDE = Instance.new("UICorner")
+uicornerDE.CornerRadius = UDim.new(0, 10)
+uicornerDE.Parent = dexExplorerButton
+
+local remoteFinderV2Button = Instance.new("TextButton")
+remoteFinderV2Button.Size = UDim2.new(1, -20, 0, 40)
+remoteFinderV2Button.Position = UDim2.new(0, 10, 0, 150)
+remoteFinderV2Button.BackgroundColor3 = Color3.fromRGB(0, 120, 255)
+remoteFinderV2Button.Text = "Remote Finder V2"
+remoteFinderV2Button.TextColor3 = Color3.fromRGB(255, 255, 255)
+remoteFinderV2Button.Parent = mainFrame
+remoteFinderV2Button.Visible = false
+
+local uicornerRFV2 = Instance.new("UICorner")
+uicornerRFV2.CornerRadius = UDim.new(0, 10)
+uicornerRFV2.Parent = remoteFinderV2Button
+
+local keybindToggle = Instance.new("TextButton")
+keybindToggle.Size = UDim2.new(1, -20, 0, 40)
+keybindToggle.Position = UDim2.new(0, 10, 0, 200)
+keybindToggle.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+keybindToggle.Text = "KeyBind: LeftControl"
+keybindToggle.TextColor3 = Color3.fromRGB(255, 255, 255)
+keybindToggle.Parent = mainFrame
+keybindToggle.Visible = false
+
+local uicornerKT = Instance.new("UICorner")
+uicornerKT.CornerRadius = UDim.new(0, 10)
+uicornerKT.Parent = keybindToggle
+
+-- Navigation Tabs (apenas 2 agora)
+local tab1 = Instance.new("TextButton")
+tab1.Size = UDim2.new(0, 30, 0, 30)
+tab1.Position = UDim2.new(0.5, -35, 1, -40)
+tab1.BackgroundColor3 = Color3.fromRGB(0, 120, 255)
+tab1.Text = "1"
+tab1.TextColor3 = Color3.fromRGB(255, 255, 255)
+tab1.Parent = mainFrame
+
+local uicornerTab1 = Instance.new("UICorner")
+uicornerTab1.CornerRadius = UDim.new(0, 5)
+uicornerTab1.Parent = tab1
+
+local tab2 = Instance.new("TextButton")
+tab2.Size = UDim2.new(0, 30, 0, 30)
+tab2.Position = UDim2.new(0.5, 5, 1, -40)
+tab2.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+tab2.Text = "2"
+tab2.TextColor3 = Color3.fromRGB(255, 255, 255)
+tab2.Parent = mainFrame
+
+local uicornerTab2 = Instance.new("UICorner")
+uicornerTab2.CornerRadius = UDim.new(0, 5)
+uicornerTab2.Parent = tab2
+
+-- Drag Functionality
+local dragging, dragInput, dragStart, startPos
+mainFrame.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 then
+        dragging = true
+        dragStart = input.Position
+        startPos = mainFrame.Position
+        input.Changed:Connect(function()
+            if input.UserInputState == Enum.UserInputState.End then
+                dragging = false
+            end
+        end)
+    end
+end)
+
+mainFrame.InputChanged:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseMovement then
+        dragInput = input
+    end
+end)
+
+UserInputService.InputChanged:Connect(function(input)
+    if input == dragInput and dragging then
+        local delta = input.Position - dragStart
+        mainFrame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+    end
+end)
+
+-- Animation Functions
+local function createFadeTween(object, targetTransparency, duration)
+    local tweenInfo = TweenInfo.new(duration, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
+    local tween = TweenService:Create(object, tweenInfo, {BackgroundTransparency = targetTransparency})
+    return tween
+end
+
+local function createScaleTween(object, targetScale, duration)
+    local tweenInfo = TweenInfo.new(duration, Enum.EasingStyle.Back, Enum.EasingDirection.Out)
+    local tween = TweenService:Create(object, tweenInfo, {Size = targetScale})
+    return tween
+end
+
+-- KeyBind Functionality (LeftControl to toggle GUI)
+local isGuiVisible = true
+local currentKeybind = Enum.KeyCode.LeftControl
+local isListeningForKeybind = false
+
+UserInputService.InputBegan:Connect(function(input, gameProcessed)
+    if gameProcessed then return end
+    
+    if isListeningForKeybind then
+        currentKeybind = input.KeyCode
+        keybindToggle.Text = "KeyBind: " .. input.KeyCode.Name
+        keybindToggle.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+        isListeningForKeybind = false
+        return
+    end
+    
+    if input.KeyCode == currentKeybind then
+        isGuiVisible = not isGuiVisible
+        
+        if isGuiVisible then
+            -- Show GUI with animation
+            mainFrame.Visible = true
+            local showTween = createScaleTween(mainFrame, UDim2.new(0, 300, 0, 300), 0.3)
+            mainFrame.Size = UDim2.new(0, 0, 0, 0)
+            showTween:Play()
+        else
+            -- Hide GUI instantly (no animation)
+            mainFrame.Visible = false
+        end
+    end
+end)
+
+keybindToggle.MouseButton1Click:Connect(function()
+    isListeningForKeybind = true
+    keybindToggle.Text = "Press any key..."
+    keybindToggle.BackgroundColor3 = Color3.fromRGB(255, 165, 0)
+end)
+
+-- Open Animation
+local openTween = createScaleTween(mainFrame, UDim2.new(0, 300, 0, 300), 0.5)
+mainFrame.Size = UDim2.new(0, 0, 0, 0)
+openTween:Play()
+openTween.Completed:Wait()
+
+-- Category Switching with Animation (apenas 2 categorias)
+local currentTab = 1
+local function showTab(tabNum)
+    local tweenFadeOut = createFadeTween(infiniteYieldButton, 1, 0.3)
+    local tweenFadeOutSS = createFadeTween(simpleSpyButton, 1, 0.3)
+    local tweenFadeOutCoord = createFadeTween(coordenadasToggle, 1, 0.3)
+    local tweenFadeOutRF = createFadeTween(remoteFinderButton, 1, 0.3)
+    local tweenFadeOutDE = createFadeTween(dexExplorerButton, 1, 0.3)
+    local tweenFadeOutRFV2 = createFadeTween(remoteFinderV2Button, 1, 0.3)
+    local tweenFadeOutKT = createFadeTween(keybindToggle, 1, 0.3)
+    
+    tweenFadeOut:Play()
+    tweenFadeOutSS:Play()
+    tweenFadeOutCoord:Play()
+    tweenFadeOutRF:Play()
+    tweenFadeOutDE:Play()
+    tweenFadeOutRFV2:Play()
+    tweenFadeOutKT:Play()
+    
+    tweenFadeOut.Completed:Wait()
+    
+    if tabNum == 1 then
+        infiniteYieldButton.Visible = true
+        simpleSpyButton.Visible = true
+        coordenadasToggle.Visible = true
+        remoteFinderButton.Visible = false
+        dexExplorerButton.Visible = false
+        remoteFinderV2Button.Visible = false
+        keybindToggle.Visible = false
+        tab1.BackgroundColor3 = Color3.fromRGB(0, 120, 255)
+        tab2.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+    else
+        infiniteYieldButton.Visible = false
+        simpleSpyButton.Visible = false
+        coordenadasToggle.Visible = false
+        remoteFinderButton.Visible = true
+        dexExplorerButton.Visible = true
+        remoteFinderV2Button.Visible = true
+        keybindToggle.Visible = true
+        tab1.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+        tab2.BackgroundColor3 = Color3.fromRGB(0, 120, 255)
+    end
+    
+    local tweenFadeIn = createFadeTween(infiniteYieldButton, 0, 0.3)
+    local tweenFadeInSS = createFadeTween(simpleSpyButton, 0, 0.3)
+    local tweenFadeInCoord = createFadeTween(coordenadasToggle, 0, 0.3)
+    local tweenFadeInRF = createFadeTween(remoteFinderButton, 0, 0.3)
+    local tweenFadeInDE = createFadeTween(dexExplorerButton, 0, 0.3)
+    local tweenFadeInRFV2 = createFadeTween(remoteFinderV2Button, 0, 0.3)
+    local tweenFadeInKT = createFadeTween(keybindToggle, 0, 0.3)
+    
+    if infiniteYieldButton.Visible then tweenFadeIn:Play() end
+    if simpleSpyButton.Visible then tweenFadeInSS:Play() end
+    if coordenadasToggle.Visible then tweenFadeInCoord:Play() end
+    if remoteFinderButton.Visible then tweenFadeInRF:Play() end
+    if dexExplorerButton.Visible then tweenFadeInDE:Play() end
+    if remoteFinderV2Button.Visible then tweenFadeInRFV2:Play() end
+    if keybindToggle.Visible then tweenFadeInKT:Play() end
+end
+
+tab1.MouseButton1Click:Connect(function() currentTab = 1; showTab(1) end)
+tab2.MouseButton1Click:Connect(function() currentTab = 2; showTab(2) end)
+showTab(1)
+
+-- Enhanced Coordenadas Interface (tamanho reduzido e texto maior)
+local coordFrame = Instance.new("Frame")
+coordFrame.Size = UDim2.new(0, 180, 0, 50)
+coordFrame.Position = UDim2.new(0, 10, 1, -60)
+coordFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+coordFrame.BorderSizePixel = 0
+coordFrame.Visible = false
+coordFrame.Parent = screenGui
+
+local uicornerCoord = Instance.new("UICorner")
+uicornerCoord.CornerRadius = UDim.new(0, 5)
+uicornerCoord.Parent = coordFrame
+
+local coordLabel = Instance.new("TextLabel")
+coordLabel.Size = UDim2.new(1, -10, 1, -10)
+coordLabel.Position = UDim2.new(0, 5, 0, 5)
+coordLabel.BackgroundTransparency = 1
+coordLabel.Text = "X 0.0 | Y 0.0 | Z 0.0"
+coordLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+coordLabel.TextSize = 16
+coordLabel.Font = Enum.Font.SourceSans
+coordLabel.Parent = coordFrame
+
+local draggingCoord, dragInputCoord, dragStartCoord, startPosCoord
+coordFrame.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 then
+        draggingCoord = true
+        dragStartCoord = input.Position
+        startPosCoord = coordFrame.Position
+        input.Changed:Connect(function()
+            if input.UserInputState == Enum.UserInputState.End then
+                draggingCoord = false
+            end
+        end)
+    end
+end)
+
+coordFrame.InputChanged:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseMovement then
+        dragInputCoord = input
+    end
+end)
+
+UserInputService.InputChanged:Connect(function(input)
+    if input == dragInputCoord and draggingCoord then
+        local delta = input.Position - dragStartCoord
+        coordFrame.Position = UDim2.new(startPosCoord.X.Scale, startPosCoord.X.Offset + delta.X, startPosCoord.Y.Scale, startPosCoord.Y.Offset + delta.Y)
+    end
+end)
+
+-- Toggle Coordenadas with Enhanced Update
+local isCoordActive = false
+coordenadasToggle.MouseButton1Click:Connect(function()
+    isCoordActive = not isCoordActive
+    coordenadasToggle.BackgroundColor3 = isCoordActive and Color3.fromRGB(0, 120, 255) or Color3.fromRGB(60, 60, 60)
+    coordFrame.Visible = isCoordActive
+    if isCoordActive then
+        spawn(function()
+            while isCoordActive do
+                local character = player.Character
+                if character and character:FindFirstChild("HumanoidRootPart") then
+                    local rootPart = character.HumanoidRootPart
+                    local xPos = string.format("%.1f", rootPart.Position.X)
+                    local yPos = string.format("%.1f", rootPart.Position.Y)
+                    local zPos = string.format("%.1f", rootPart.Position.Z)
+                    coordLabel.Text = "X " .. xPos .. " | Y " .. yPos .. " | Z " .. zPos
+                    -- Smooth positioning adjustment
+                    local targetPos = UDim2.new(0, 10, 1, -60)
+                    local tween = TweenService:Create(coordFrame, TweenInfo.new(0.1), {Position = targetPos})
+                    tween:Play()
+                end
+                wait(0.05) -- Faster update rate for smoother experience
+            end
+        end)
+    end
+end)
+
+-- Close Animation with Button Destruction
+closeButton.MouseButton1Click:Connect(function()
+    local closeTween = createFadeTween(mainFrame, 1, 0.3)
+    closeTween:Play()
+    
+    -- Destroy title and buttons first
+    title:Destroy()
+    infiniteYieldButton:Destroy()
+    simpleSpyButton:Destroy()
+    coordenadasToggle:Destroy()
+    remoteFinderButton:Destroy()
+    dexExplorerButton:Destroy()
+    remoteFinderV2Button:Destroy()
+    keybindToggle:Destroy()
+    tab1:Destroy()
+    tab2:Destroy()
+    closeButton:Destroy()
+    
+    closeTween.Completed:Wait()
+    mainFrame:Destroy()
+    screenGui:Destroy()
+end)
+
+-- Button Functions
+infiniteYieldButton.MouseButton1Click:Connect(function()
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/EdgeIY/infiniteyield/master/source"))()
+end)
+
+simpleSpyButton.MouseButton1Click:Connect(function()
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/78n/SimpleSpy/main/SimpleSpySource.lua"))()
+end)
+
+remoteFinderButton.MouseButton1Click:Connect(function()
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/RayyyFirst/Main/refs/heads/main/RatwareRemoteFinder",true))()
+end)
+
+dexExplorerButton.MouseButton1Click:Connect(function()
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/infyiff/backup/main/dex.lua"))()
+end)
+
+remoteFinderV2Button.MouseButton1Click:Connect(function()
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/mxx3x/Remote-Finder-v2/refs/heads/main/Remote%20Finder%20v2"))()
+end)
