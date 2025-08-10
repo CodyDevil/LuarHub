@@ -1,16 +1,107 @@
-local player = game.Players.LocalPlayer
-local mouse = player:GetMouse()
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
 local UserInputService = game:GetService("UserInputService")
 local TweenService = game:GetService("TweenService")
 
-local screenGui = Instance.new("ScreenGui")
-screenGui.Parent = player:WaitForChild("PlayerGui")
+-- Wait for PlayerGui to ensure proper initialization
+wait(0.1)
 
+-- Create ScreenGui
+local screenGui = Instance.new("ScreenGui")
+screenGui.Name = "LuarCraft"
+screenGui.ResetOnSpawn = false
+screenGui.ZIndexBehavior = Enum.ZIndexBehavior.Global
+screenGui.Enabled = true
+screenGui.Parent = LocalPlayer:WaitForChild("PlayerGui", 5)
+if not screenGui.Parent then
+    warn("Failed to parent ScreenGui to PlayerGui")
+    return
+end
+screenGui.Parent = LocalPlayer.PlayerGui
+
+-- Create Loading Screen (sem fundo preto)
+local loadingFrame = Instance.new("Frame")
+loadingFrame.Size = UDim2.new(1, 0, 1, 0)
+loadingFrame.BackgroundTransparency = 1 -- Removido fundo preto
+loadingFrame.ZIndex = 1000
+loadingFrame.Parent = screenGui
+
+local loadingContainer = Instance.new("Frame")
+loadingContainer.Size = UDim2.new(0, 350, 0, 180) -- Mais compacto
+loadingContainer.Position = UDim2.new(0.5, -175, 0.5, -90)
+loadingContainer.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+loadingContainer.BorderSizePixel = 0
+loadingContainer.ZIndex = 1001
+loadingContainer.Parent = loadingFrame
+
+local loadingCorner = Instance.new("UICorner")
+loadingCorner.CornerRadius = UDim.new(0, 15)
+loadingCorner.Parent = loadingContainer
+
+local loadingTitle = Instance.new("TextLabel")
+loadingTitle.Size = UDim2.new(1, 0, 0, 50)
+loadingTitle.Position = UDim2.new(0, 0, 0, 15)
+loadingTitle.Text = "LuarCraft"
+loadingTitle.TextColor3 = Color3.fromRGB(0, 162, 255)
+loadingTitle.Font = Enum.Font.SourceSansBold
+loadingTitle.TextSize = 28
+loadingTitle.BackgroundTransparency = 1
+loadingTitle.ZIndex = 1002
+loadingTitle.Parent = loadingContainer
+
+local loadingText = Instance.new("TextLabel")
+loadingText.Size = UDim2.new(1, -40, 0, 25)
+loadingText.Position = UDim2.new(0, 20, 0, 70)
+loadingText.Text = "Configurando interface..."
+loadingText.TextColor3 = Color3.fromRGB(255, 255, 255)
+loadingText.Font = Enum.Font.SourceSans
+loadingText.TextSize = 16
+loadingText.BackgroundTransparency = 1
+loadingText.ZIndex = 1002
+loadingText.Parent = loadingContainer
+
+local loadingBar = Instance.new("Frame")
+loadingBar.Size = UDim2.new(0, 280, 0, 6)
+loadingBar.Position = UDim2.new(0.5, -140, 0, 110)
+loadingBar.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+loadingBar.BorderSizePixel = 0
+loadingBar.ZIndex = 1002
+loadingBar.Parent = loadingContainer
+
+local loadingBarCorner = Instance.new("UICorner")
+loadingBarCorner.CornerRadius = UDim.new(0, 3)
+loadingBarCorner.Parent = loadingBar
+
+local loadingProgress = Instance.new("Frame")
+loadingProgress.Size = UDim2.new(0, 0, 1, 0)
+loadingProgress.BackgroundColor3 = Color3.fromRGB(0, 162, 255)
+loadingProgress.BorderSizePixel = 0
+loadingProgress.ZIndex = 1003
+loadingProgress.Parent = loadingBar
+
+local loadingProgressCorner = Instance.new("UICorner")
+loadingProgressCorner.CornerRadius = UDim.new(0, 3)
+loadingProgressCorner.Parent = loadingProgress
+
+local loadingPercent = Instance.new("TextLabel")
+loadingPercent.Size = UDim2.new(1, 0, 0, 20)
+loadingPercent.Position = UDim2.new(0, 0, 0, 130)
+loadingPercent.Text = "75%"
+loadingPercent.TextColor3 = Color3.fromRGB(180, 180, 180)
+loadingPercent.Font = Enum.Font.SourceSans
+loadingPercent.TextSize = 14
+loadingPercent.BackgroundTransparency = 1
+loadingPercent.ZIndex = 1002
+loadingPercent.Parent = loadingContainer
+
+-- Create Main Frame (menor)
 local mainFrame = Instance.new("Frame")
-mainFrame.Size = UDim2.new(0, 300, 0, 300)
-mainFrame.Position = UDim2.new(0.5, -150, 0.5, -150)
+mainFrame.Size = UDim2.new(0, 320, 0, 350) -- Reduzido
+mainFrame.Position = UDim2.new(0.5, -160, 0.5, -175)
 mainFrame.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
 mainFrame.BorderSizePixel = 0
+mainFrame.ZIndex = 1000
+mainFrame.Visible = false
 mainFrame.Parent = screenGui
 
 local uicorner = Instance.new("UICorner")
@@ -20,137 +111,341 @@ uicorner.Parent = mainFrame
 local title = Instance.new("TextLabel")
 title.Size = UDim2.new(1, 0, 0, 40)
 title.BackgroundTransparency = 1
-title.Text = "Luar Creating"
+title.Text = "LuarCraft"
 title.TextColor3 = Color3.fromRGB(255, 255, 255)
-title.TextSize = 20
+title.TextSize = 18
 title.Font = Enum.Font.SourceSansBold
+title.ZIndex = 1001
 title.Parent = mainFrame
 
 local closeButton = Instance.new("TextButton")
-closeButton.Size = UDim2.new(0, 30, 0, 30)
-closeButton.Position = UDim2.new(1, -40, 0, 5)
+closeButton.Size = UDim2.new(0, 25, 0, 25)
+closeButton.Position = UDim2.new(1, -35, 0, 7.5)
 closeButton.BackgroundTransparency = 1
 closeButton.Text = "X"
 closeButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+closeButton.TextSize = 16
+closeButton.Font = Enum.Font.SourceSansBold
+closeButton.ZIndex = 1001
 closeButton.Parent = mainFrame
 
 local uicornerClose = Instance.new("UICorner")
 uicornerClose.CornerRadius = UDim.new(0, 5)
 uicornerClose.Parent = closeButton
 
--- Tab 1 Buttons
+-- Create Search Bar
+local searchBar = Instance.new("TextBox")
+searchBar.Size = UDim2.new(1, -20, 0, 35)
+searchBar.Position = UDim2.new(0, 10, 0, 50)
+searchBar.PlaceholderText = "Search scripts..."
+searchBar.Text = ""
+searchBar.TextColor3 = Color3.fromRGB(255, 255, 255)
+searchBar.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+searchBar.TextSize = 14
+searchBar.Font = Enum.Font.SourceSans
+searchBar.ZIndex = 1001
+searchBar.Parent = mainFrame
+
+local uicornerSearch = Instance.new("UICorner")
+uicornerSearch.CornerRadius = UDim.new(0, 8)
+uicornerSearch.Parent = searchBar
+
+-- Create Scrolling Frame for Buttons
+local scrollingFrame = Instance.new("ScrollingFrame")
+scrollingFrame.Size = UDim2.new(1, -20, 0, 210) -- Ajustado para não sobrepor tabs
+scrollingFrame.Position = UDim2.new(0, 10, 0, 95)
+scrollingFrame.BackgroundTransparency = 1
+scrollingFrame.ZIndex = 1001
+scrollingFrame.CanvasSize = UDim2.new(0, 0, 2, 0)
+scrollingFrame.ScrollBarThickness = 6
+scrollingFrame.ScrollBarImageColor3 = Color3.fromRGB(100, 100, 100)
+scrollingFrame.Parent = mainFrame
+
+local uiListLayout = Instance.new("UIListLayout")
+uiListLayout.Padding = UDim.new(0, 6)
+uiListLayout.SortOrder = Enum.SortOrder.LayoutOrder
+uiListLayout.Parent = scrollingFrame
+
+-- Category 1 Buttons (Home)
 local infiniteYieldButton = Instance.new("TextButton")
-infiniteYieldButton.Size = UDim2.new(1, -20, 0, 40)
-infiniteYieldButton.Position = UDim2.new(0, 10, 0, 50)
-infiniteYieldButton.BackgroundColor3 = Color3.fromRGB(0, 120, 255)
+infiniteYieldButton.Size = UDim2.new(1, 0, 0, 40)
+infiniteYieldButton.BackgroundColor3 = Color3.fromRGB(0, 100, 200) -- Mudado para azul padrão
 infiniteYieldButton.Text = "Infinite Yield"
 infiniteYieldButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-infiniteYieldButton.Parent = mainFrame
+infiniteYieldButton.TextSize = 14
+infiniteYieldButton.Font = Enum.Font.SourceSansBold
+infiniteYieldButton.ZIndex = 1002
+infiniteYieldButton.LayoutOrder = 1
+infiniteYieldButton.Parent = scrollingFrame
 
 local uicornerIY = Instance.new("UICorner")
-uicornerIY.CornerRadius = UDim.new(0, 10)
+uicornerIY.CornerRadius = UDim.new(0, 8)
 uicornerIY.Parent = infiniteYieldButton
 
 local simpleSpyButton = Instance.new("TextButton")
-simpleSpyButton.Size = UDim2.new(1, -20, 0, 40)
-simpleSpyButton.Position = UDim2.new(0, 10, 0, 100)
-simpleSpyButton.BackgroundColor3 = Color3.fromRGB(0, 120, 255)
+simpleSpyButton.Size = UDim2.new(1, 0, 0, 40)
+simpleSpyButton.BackgroundColor3 = Color3.fromRGB(0, 100, 200) -- Azul padrão
 simpleSpyButton.Text = "Simple Spy"
 simpleSpyButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-simpleSpyButton.Parent = mainFrame
+simpleSpyButton.TextSize = 14
+simpleSpyButton.Font = Enum.Font.SourceSansBold
+simpleSpyButton.ZIndex = 1002
+simpleSpyButton.LayoutOrder = 2
+simpleSpyButton.Parent = scrollingFrame
 
 local uicornerSS = Instance.new("UICorner")
-uicornerSS.CornerRadius = UDim.new(0, 10)
+uicornerSS.CornerRadius = UDim.new(0, 8)
 uicornerSS.Parent = simpleSpyButton
 
-local coordenadasToggle = Instance.new("TextButton")
-coordenadasToggle.Size = UDim2.new(1, -20, 0, 40)
-coordenadasToggle.Position = UDim2.new(0, 10, 0, 150)
-coordenadasToggle.BackgroundColor3 = Color3.fromRGB(100, 100, 100)
-coordenadasToggle.Text = "Coordenadas"
-coordenadasToggle.TextColor3 = Color3.fromRGB(255, 255, 255)
-coordenadasToggle.Parent = mainFrame
-
-local uicornerCoordToggle = Instance.new("UICorner")
-uicornerCoordToggle.CornerRadius = UDim.new(0, 10)
-uicornerCoordToggle.Parent = coordenadasToggle
-
--- Tab 2 Buttons
-local remoteFinderButton = Instance.new("TextButton")
-remoteFinderButton.Size = UDim2.new(1, -20, 0, 40)
-remoteFinderButton.Position = UDim2.new(0, 10, 0, 50)
-remoteFinderButton.BackgroundColor3 = Color3.fromRGB(0, 120, 255)
-remoteFinderButton.Text = "Remote Finder"
-remoteFinderButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-remoteFinderButton.Parent = mainFrame
-remoteFinderButton.Visible = false
-
-local uicornerRF = Instance.new("UICorner")
-uicornerRF.CornerRadius = UDim.new(0, 10)
-uicornerRF.Parent = remoteFinderButton
-
 local dexExplorerButton = Instance.new("TextButton")
-dexExplorerButton.Size = UDim2.new(1, -20, 0, 40)
-dexExplorerButton.Position = UDim2.new(0, 10, 0, 100)
-dexExplorerButton.BackgroundColor3 = Color3.fromRGB(0, 120, 255)
+dexExplorerButton.Size = UDim2.new(1, 0, 0, 40)
+dexExplorerButton.BackgroundColor3 = Color3.fromRGB(0, 100, 200) -- Azul padrão
 dexExplorerButton.Text = "Dex Explorer"
 dexExplorerButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-dexExplorerButton.Parent = mainFrame
-dexExplorerButton.Visible = false
+dexExplorerButton.TextSize = 14
+dexExplorerButton.Font = Enum.Font.SourceSansBold
+dexExplorerButton.ZIndex = 1002
+dexExplorerButton.LayoutOrder = 3
+dexExplorerButton.Parent = scrollingFrame
 
 local uicornerDE = Instance.new("UICorner")
-uicornerDE.CornerRadius = UDim.new(0, 10)
+uicornerDE.CornerRadius = UDim.new(0, 8)
 uicornerDE.Parent = dexExplorerButton
 
 local remoteFinderV2Button = Instance.new("TextButton")
-remoteFinderV2Button.Size = UDim2.new(1, -20, 0, 40)
-remoteFinderV2Button.Position = UDim2.new(0, 10, 0, 150)
-remoteFinderV2Button.BackgroundColor3 = Color3.fromRGB(0, 120, 255)
-remoteFinderV2Button.Text = "Remote Finder V2"
+remoteFinderV2Button.Size = UDim2.new(1, 0, 0, 40)
+remoteFinderV2Button.BackgroundColor3 = Color3.fromRGB(0, 100, 200) -- Azul padrão
+remoteFinderV2Button.Text = "Remote Finder 2"
 remoteFinderV2Button.TextColor3 = Color3.fromRGB(255, 255, 255)
-remoteFinderV2Button.Parent = mainFrame
-remoteFinderV2Button.Visible = false
+remoteFinderV2Button.TextSize = 14
+remoteFinderV2Button.Font = Enum.Font.SourceSansBold
+remoteFinderV2Button.ZIndex = 1002
+remoteFinderV2Button.LayoutOrder = 4
+remoteFinderV2Button.Parent = scrollingFrame
 
 local uicornerRFV2 = Instance.new("UICorner")
-uicornerRFV2.CornerRadius = UDim.new(0, 10)
+uicornerRFV2.CornerRadius = UDim.new(0, 8)
 uicornerRFV2.Parent = remoteFinderV2Button
 
+-- Improved Toggle System for Coordenadas
+local coordenadasToggle = Instance.new("Frame")
+coordenadasToggle.Size = UDim2.new(1, 0, 0, 40)
+coordenadasToggle.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
+coordenadasToggle.ZIndex = 1002
+coordenadasToggle.LayoutOrder = 5
+coordenadasToggle.Parent = scrollingFrame
+
+local uicornerCoordToggle = Instance.new("UICorner")
+uicornerCoordToggle.CornerRadius = UDim.new(0, 8)
+uicornerCoordToggle.Parent = coordenadasToggle
+
+local coordenadasLabel = Instance.new("TextLabel")
+coordenadasLabel.Size = UDim2.new(0.7, 0, 1, 0)
+coordenadasLabel.BackgroundTransparency = 1
+coordenadasLabel.Text = "Coordenadas"
+coordenadasLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+coordenadasLabel.TextSize = 14
+coordenadasLabel.Font = Enum.Font.SourceSansBold
+coordenadasLabel.TextXAlignment = Enum.TextXAlignment.Left
+coordenadasLabel.Position = UDim2.new(0, 15, 0, 0)
+coordenadasLabel.ZIndex = 1003
+coordenadasLabel.Parent = coordenadasToggle
+
+local coordenadasSwitch = Instance.new("Frame")
+coordenadasSwitch.Size = UDim2.new(0, 45, 0, 22)
+coordenadasSwitch.Position = UDim2.new(1, -60, 0.5, -11)
+coordenadasSwitch.BackgroundColor3 = Color3.fromRGB(80, 80, 80)
+coordenadasSwitch.ZIndex = 1003
+coordenadasSwitch.Parent = coordenadasToggle
+
+local coordenadasSwitchCorner = Instance.new("UICorner")
+coordenadasSwitchCorner.CornerRadius = UDim.new(0.5, 0)
+coordenadasSwitchCorner.Parent = coordenadasSwitch
+
+local coordenadasKnob = Instance.new("Frame")
+coordenadasKnob.Size = UDim2.new(0, 18, 0, 18)
+coordenadasKnob.Position = UDim2.new(0, 2, 0, 2)
+coordenadasKnob.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+coordenadasKnob.ZIndex = 1004
+coordenadasKnob.Parent = coordenadasSwitch
+
+local coordenadasKnobCorner = Instance.new("UICorner")
+coordenadasKnobCorner.CornerRadius = UDim.new(0.5, 0)
+coordenadasKnobCorner.Parent = coordenadasKnob
+
+local coordenadasButton = Instance.new("TextButton")
+coordenadasButton.Size = UDim2.new(1, 0, 1, 0)
+coordenadasButton.BackgroundTransparency = 1
+coordenadasButton.Text = ""
+coordenadasButton.ZIndex = 1005
+coordenadasButton.Parent = coordenadasToggle
+
+-- Category 2 Buttons (Settings) - Posicionados mais para cima
 local keybindToggle = Instance.new("TextButton")
-keybindToggle.Size = UDim2.new(1, -20, 0, 40)
-keybindToggle.Position = UDim2.new(0, 10, 0, 200)
+keybindToggle.Size = UDim2.new(1, 0, 0, 40)
 keybindToggle.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
 keybindToggle.Text = "KeyBind: LeftControl"
 keybindToggle.TextColor3 = Color3.fromRGB(255, 255, 255)
-keybindToggle.Parent = mainFrame
+keybindToggle.TextSize = 14
+keybindToggle.Font = Enum.Font.SourceSansBold
+keybindToggle.ZIndex = 1002
+keybindToggle.LayoutOrder = 1
 keybindToggle.Visible = false
+keybindToggle.Parent = scrollingFrame
 
 local uicornerKT = Instance.new("UICorner")
-uicornerKT.CornerRadius = UDim.new(0, 10)
+uicornerKT.CornerRadius = UDim.new(0, 8)
 uicornerKT.Parent = keybindToggle
 
--- Navigation Tabs (apenas 2 agora)
+-- Improved Transparency Toggle
+local transparencyToggle = Instance.new("Frame")
+transparencyToggle.Size = UDim2.new(1, 0, 0, 40)
+transparencyToggle.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
+transparencyToggle.ZIndex = 1002
+transparencyToggle.LayoutOrder = 2
+transparencyToggle.Visible = false
+transparencyToggle.Parent = scrollingFrame
+
+local uicornerTT = Instance.new("UICorner")
+uicornerTT.CornerRadius = UDim.new(0, 8)
+uicornerTT.Parent = transparencyToggle
+
+local transparencyLabel = Instance.new("TextLabel")
+transparencyLabel.Size = UDim2.new(0.7, 0, 1, 0)
+transparencyLabel.BackgroundTransparency = 1
+transparencyLabel.Text = "Transparência"
+transparencyLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+transparencyLabel.TextSize = 14
+transparencyLabel.Font = Enum.Font.SourceSansBold
+transparencyLabel.TextXAlignment = Enum.TextXAlignment.Left
+transparencyLabel.Position = UDim2.new(0, 15, 0, 0)
+transparencyLabel.ZIndex = 1003
+transparencyLabel.Parent = transparencyToggle
+
+local transparencySwitch = Instance.new("Frame")
+transparencySwitch.Size = UDim2.new(0, 45, 0, 22)
+transparencySwitch.Position = UDim2.new(1, -60, 0.5, -11)
+transparencySwitch.BackgroundColor3 = Color3.fromRGB(80, 80, 80)
+transparencySwitch.ZIndex = 1003
+transparencySwitch.Parent = transparencyToggle
+
+local transparencySwitchCorner = Instance.new("UICorner")
+transparencySwitchCorner.CornerRadius = UDim.new(0.5, 0)
+transparencySwitchCorner.Parent = transparencySwitch
+
+local transparencyKnob = Instance.new("Frame")
+transparencyKnob.Size = UDim2.new(0, 18, 0, 18)
+transparencyKnob.Position = UDim2.new(0, 2, 0, 2)
+transparencyKnob.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+transparencyKnob.ZIndex = 1004
+transparencyKnob.Parent = transparencySwitch
+
+local transparencyKnobCorner = Instance.new("UICorner")
+transparencyKnobCorner.CornerRadius = UDim.new(0.5, 0)
+transparencyKnobCorner.Parent = transparencyKnob
+
+local transparencyButton = Instance.new("TextButton")
+transparencyButton.Size = UDim2.new(1, 0, 1, 0)
+transparencyButton.BackgroundTransparency = 1
+transparencyButton.Text = ""
+transparencyButton.ZIndex = 1005
+transparencyButton.Parent = transparencyToggle
+
+-- Updated Color Dropdown System com apenas 3 cores
+local colorDropdown = Instance.new("Frame")
+colorDropdown.Size = UDim2.new(1, 0, 0, 40)
+colorDropdown.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
+colorDropdown.ZIndex = 1002
+colorDropdown.LayoutOrder = 3
+colorDropdown.Visible = false
+colorDropdown.Parent = scrollingFrame
+
+local uicornerCD = Instance.new("UICorner")
+uicornerCD.CornerRadius = UDim.new(0, 8)
+uicornerCD.Parent = colorDropdown
+
+local colorLabel = Instance.new("TextLabel")
+colorLabel.Size = UDim2.new(0.5, 0, 1, 0)
+colorLabel.BackgroundTransparency = 1
+colorLabel.Text = "Cor do Tema"
+colorLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+colorLabel.TextSize = 14
+colorLabel.Font = Enum.Font.SourceSansBold
+colorLabel.TextXAlignment = Enum.TextXAlignment.Left
+colorLabel.Position = UDim2.new(0, 15, 0, 0)
+colorLabel.ZIndex = 1003
+colorLabel.Parent = colorDropdown
+
+local colorButton = Instance.new("TextButton")
+colorButton.Size = UDim2.new(0, 100, 0, 30)
+colorButton.Position = UDim2.new(1, -115, 0.5, -15)
+colorButton.BackgroundColor3 = Color3.fromRGB(0, 100, 200)
+colorButton.Text = "Azul ▼"
+colorButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+colorButton.TextSize = 12
+colorButton.Font = Enum.Font.SourceSans
+colorButton.ZIndex = 1003
+colorButton.Parent = colorDropdown
+
+local uicornerCB = Instance.new("UICorner")
+uicornerCB.CornerRadius = UDim.new(0, 6)
+uicornerCB.Parent = colorButton
+
+-- Dropdown Menu
+local colorMenu = Instance.new("Frame")
+colorMenu.Size = UDim2.new(0, 120, 0, 100) -- Reduzido para 3 cores
+colorMenu.Position = UDim2.new(1, -130, 1, 5)
+colorMenu.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
+colorMenu.BorderSizePixel = 0
+colorMenu.ZIndex = 1010
+colorMenu.Visible = false
+colorMenu.Parent = colorDropdown
+
+local uicornerCM = Instance.new("UICorner")
+uicornerCM.CornerRadius = UDim.new(0, 8)
+uicornerCM.Parent = colorMenu
+
+local colorScrollFrame = Instance.new("ScrollingFrame")
+colorScrollFrame.Size = UDim2.new(1, -10, 1, -10)
+colorScrollFrame.Position = UDim2.new(0, 5, 0, 5)
+colorScrollFrame.BackgroundTransparency = 1
+colorScrollFrame.ScrollBarThickness = 4
+colorScrollFrame.ZIndex = 1011
+colorScrollFrame.Parent = colorMenu
+
+local colorListLayout = Instance.new("UIListLayout")
+colorListLayout.Padding = UDim.new(0, 2)
+colorListLayout.Parent = colorScrollFrame
+
+-- Navigation Tabs com nomes atualizados
 local tab1 = Instance.new("TextButton")
-tab1.Size = UDim2.new(0, 30, 0, 30)
-tab1.Position = UDim2.new(0.5, -35, 1, -40)
-tab1.BackgroundColor3 = Color3.fromRGB(0, 120, 255)
-tab1.Text = "1"
+tab1.Size = UDim2.new(0, 60, 0, 30) -- Aumentado para comportar texto
+tab1.Position = UDim2.new(0.5, -65, 1, -40)
+tab1.BackgroundColor3 = Color3.fromRGB(0, 100, 200)
+tab1.Text = "Home"
 tab1.TextColor3 = Color3.fromRGB(255, 255, 255)
+tab1.TextSize = 14
+tab1.Font = Enum.Font.SourceSansBold
+tab1.ZIndex = 1001
 tab1.Parent = mainFrame
 
 local uicornerTab1 = Instance.new("UICorner")
-uicornerTab1.CornerRadius = UDim.new(0, 5)
+uicornerTab1.CornerRadius = UDim.new(0, 8)
 uicornerTab1.Parent = tab1
 
 local tab2 = Instance.new("TextButton")
-tab2.Size = UDim2.new(0, 30, 0, 30)
+tab2.Size = UDim2.new(0, 60, 0, 30) -- Aumentado para comportar texto
 tab2.Position = UDim2.new(0.5, 5, 1, -40)
 tab2.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
-tab2.Text = "2"
+tab2.Text = "Settings"
 tab2.TextColor3 = Color3.fromRGB(255, 255, 255)
+tab2.TextSize = 14
+tab2.Font = Enum.Font.SourceSansBold
+tab2.ZIndex = 1001
 tab2.Parent = mainFrame
 
 local uicornerTab2 = Instance.new("UICorner")
-uicornerTab2.CornerRadius = UDim.new(0, 5)
+uicornerTab2.CornerRadius = UDim.new(0, 8)
 uicornerTab2.Parent = tab2
 
 -- Drag Functionality
@@ -182,23 +477,107 @@ UserInputService.InputChanged:Connect(function(input)
 end)
 
 -- Animation Functions
-local function createFadeTween(object, targetTransparency, duration)
-    local tweenInfo = TweenInfo.new(duration, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
-    local tween = TweenService:Create(object, tweenInfo, {BackgroundTransparency = targetTransparency})
+local function createTween(object, properties, duration, easingStyle)
+    local tweenInfo = TweenInfo.new(duration or 0.3, easingStyle or Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
+    local tween = TweenService:Create(object, tweenInfo, properties)
     return tween
 end
 
-local function createScaleTween(object, targetScale, duration)
-    local tweenInfo = TweenInfo.new(duration, Enum.EasingStyle.Back, Enum.EasingDirection.Out)
-    local tween = TweenService:Create(object, tweenInfo, {Size = targetScale})
-    return tween
+-- Enhanced Loading Animation
+local function playLoadingAnimation()
+    local stages = {"Loading Home...", "Loading Settings...", "Loading UI...", "Closing..."}
+    
+    for i = 1, #stages do
+        loadingText.Text = stages[i]
+        local progress = i / #stages
+        local progressTween = createTween(loadingProgress, {Size = UDim2.new(progress, 0, 1, 0)}, 0.6)
+        progressTween:Play()
+        loadingPercent.Text = math.floor(progress * 100) .. "%"
+        wait(0.6)
+    end
+    wait(0.3)
 end
 
--- KeyBind Functionality (LeftControl to toggle GUI)
+-- Show Main GUI after Loading
+local function showMainGui()
+    playLoadingAnimation()
+    loadingFrame.Visible = false
+    mainFrame.Visible = true
+    local openTween = createTween(mainFrame, {Size = UDim2.new(0, 320, 0, 350)}, 0.5, Enum.EasingStyle.Back)
+    mainFrame.Size = UDim2.new(0, 0, 0, 0)
+    openTween:Play()
+end
+
+-- Variables
 local isGuiVisible = true
 local currentKeybind = Enum.KeyCode.LeftControl
 local isListeningForKeybind = false
+local mainColor = Color3.fromRGB(0, 100, 200) -- Azul padrão
+local isTransparent = false
+local isCoordActive = false
 
+-- Fixed Color System com apenas 3 cores
+local colors = {
+    {name = "Azul", color = Color3.fromRGB(0, 100, 200)},
+    {name = "Vermelho", color = Color3.fromRGB(200, 50, 50)},
+    {name = "Cinza Escuro", color = Color3.fromRGB(70, 70, 70)}
+}
+local currentColorIndex = 1
+
+-- Create color options
+for i, colorData in ipairs(colors) do
+    local colorOption = Instance.new("TextButton")
+    colorOption.Size = UDim2.new(1, 0, 0, 25)
+    colorOption.BackgroundColor3 = colorData.color
+    colorOption.Text = colorData.name
+    colorOption.TextColor3 = Color3.fromRGB(255, 255, 255)
+    colorOption.TextSize = 12
+    colorOption.Font = Enum.Font.SourceSans
+    colorOption.ZIndex = 1012
+    colorOption.Parent = colorScrollFrame
+    
+    local optionCorner = Instance.new("UICorner")
+    optionCorner.CornerRadius = UDim.new(0, 4)
+    optionCorner.Parent = colorOption
+    
+    colorOption.MouseButton1Click:Connect(function()
+        currentColorIndex = i
+        mainColor = colorData.color
+        colorButton.Text = colorData.name .. " ▼"
+        colorButton.BackgroundColor3 = colorData.color
+        colorMenu.Visible = false
+        
+        -- Aplicar cor imediatamente
+        updateAllColors(colorData.color)
+        
+        print("Cor alterada para:", colorData.name, "RGB:", colorData.color.R * 255, colorData.color.G * 255, colorData.color.B * 255)
+    end)
+end
+
+colorScrollFrame.CanvasSize = UDim2.new(0, 0, 0, colorListLayout.AbsoluteContentSize.Y)
+
+-- Toggle dropdown
+colorButton.MouseButton1Click:Connect(function()
+    colorMenu.Visible = not colorMenu.Visible
+end)
+
+-- Close dropdown when clicking outside
+UserInputService.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 then
+        if colorMenu.Visible then
+            local mousePos = UserInputService:GetMouseLocation()
+            local menuPos = colorMenu.AbsolutePosition
+            local menuSize = colorMenu.AbsoluteSize
+            
+            if mousePos.X < menuPos.X or mousePos.X > menuPos.X + menuSize.X or 
+               mousePos.Y < menuPos.Y or mousePos.Y > menuPos.Y + menuSize.Y then
+                colorMenu.Visible = false
+            end
+        end
+    end
+end)
+
+-- KeyBind System
 UserInputService.InputBegan:Connect(function(input, gameProcessed)
     if gameProcessed then return end
     
@@ -212,119 +591,61 @@ UserInputService.InputBegan:Connect(function(input, gameProcessed)
     
     if input.KeyCode == currentKeybind then
         isGuiVisible = not isGuiVisible
-        
+        mainFrame.Visible = isGuiVisible
         if isGuiVisible then
-            -- Show GUI with animation
-            mainFrame.Visible = true
-            local showTween = createScaleTween(mainFrame, UDim2.new(0, 300, 0, 300), 0.3)
+            local showTween = createTween(mainFrame, {Size = UDim2.new(0, 320, 0, 350)}, 0.4, Enum.EasingStyle.Back)
             mainFrame.Size = UDim2.new(0, 0, 0, 0)
             showTween:Play()
-        else
-            -- Hide GUI instantly (no animation)
-            mainFrame.Visible = false
         end
     end
 end)
 
+-- KeyBind Button
 keybindToggle.MouseButton1Click:Connect(function()
-    isListeningForKeybind = true
-    keybindToggle.Text = "Press any key..."
-    keybindToggle.BackgroundColor3 = Color3.fromRGB(255, 165, 0)
+    if not isListeningForKeybind then
+        isListeningForKeybind = true
+        keybindToggle.Text = "Pressione qualquer tecla..."
+        keybindToggle.BackgroundColor3 = Color3.fromRGB(255, 165, 0)
+    end
 end)
 
--- Open Animation
-local openTween = createScaleTween(mainFrame, UDim2.new(0, 300, 0, 300), 0.5)
-mainFrame.Size = UDim2.new(0, 0, 0, 0)
-openTween:Play()
-openTween.Completed:Wait()
-
--- Category Switching with Animation (apenas 2 categorias)
-local currentTab = 1
-local function showTab(tabNum)
-    local tweenFadeOut = createFadeTween(infiniteYieldButton, 1, 0.3)
-    local tweenFadeOutSS = createFadeTween(simpleSpyButton, 1, 0.3)
-    local tweenFadeOutCoord = createFadeTween(coordenadasToggle, 1, 0.3)
-    local tweenFadeOutRF = createFadeTween(remoteFinderButton, 1, 0.3)
-    local tweenFadeOutDE = createFadeTween(dexExplorerButton, 1, 0.3)
-    local tweenFadeOutRFV2 = createFadeTween(remoteFinderV2Button, 1, 0.3)
-    local tweenFadeOutKT = createFadeTween(keybindToggle, 1, 0.3)
-    
-    tweenFadeOut:Play()
-    tweenFadeOutSS:Play()
-    tweenFadeOutCoord:Play()
-    tweenFadeOutRF:Play()
-    tweenFadeOutDE:Play()
-    tweenFadeOutRFV2:Play()
-    tweenFadeOutKT:Play()
-    
-    tweenFadeOut.Completed:Wait()
-    
-    if tabNum == 1 then
-        infiniteYieldButton.Visible = true
-        simpleSpyButton.Visible = true
-        coordenadasToggle.Visible = true
-        remoteFinderButton.Visible = false
-        dexExplorerButton.Visible = false
-        remoteFinderV2Button.Visible = false
-        keybindToggle.Visible = false
-        tab1.BackgroundColor3 = Color3.fromRGB(0, 120, 255)
-        tab2.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
-    else
-        infiniteYieldButton.Visible = false
-        simpleSpyButton.Visible = false
-        coordenadasToggle.Visible = false
-        remoteFinderButton.Visible = true
-        dexExplorerButton.Visible = true
-        remoteFinderV2Button.Visible = true
-        keybindToggle.Visible = true
-        tab1.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
-        tab2.BackgroundColor3 = Color3.fromRGB(0, 120, 255)
-    end
-    
-    local tweenFadeIn = createFadeTween(infiniteYieldButton, 0, 0.3)
-    local tweenFadeInSS = createFadeTween(simpleSpyButton, 0, 0.3)
-    local tweenFadeInCoord = createFadeTween(coordenadasToggle, 0, 0.3)
-    local tweenFadeInRF = createFadeTween(remoteFinderButton, 0, 0.3)
-    local tweenFadeInDE = createFadeTween(dexExplorerButton, 0, 0.3)
-    local tweenFadeInRFV2 = createFadeTween(remoteFinderV2Button, 0, 0.3)
-    local tweenFadeInKT = createFadeTween(keybindToggle, 0, 0.3)
-    
-    if infiniteYieldButton.Visible then tweenFadeIn:Play() end
-    if simpleSpyButton.Visible then tweenFadeInSS:Play() end
-    if coordenadasToggle.Visible then tweenFadeInCoord:Play() end
-    if remoteFinderButton.Visible then tweenFadeInRF:Play() end
-    if dexExplorerButton.Visible then tweenFadeInDE:Play() end
-    if remoteFinderV2Button.Visible then tweenFadeInRFV2:Play() end
-    if keybindToggle.Visible then tweenFadeInKT:Play() end
-end
-
-tab1.MouseButton1Click:Connect(function() currentTab = 1; showTab(1) end)
-tab2.MouseButton1Click:Connect(function() currentTab = 2; showTab(2) end)
-showTab(1)
-
--- Enhanced Coordenadas Interface (tamanho reduzido e texto maior)
+-- Enhanced Coordenadas Interface (menor e letras maiores)
 local coordFrame = Instance.new("Frame")
-coordFrame.Size = UDim2.new(0, 180, 0, 50)
-coordFrame.Position = UDim2.new(0, 10, 1, -60)
-coordFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+coordFrame.Size = UDim2.new(0, 180, 0, 45) -- Interface menor
+coordFrame.Position = UDim2.new(0, 10, 1, -55)
+coordFrame.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
 coordFrame.BorderSizePixel = 0
+coordFrame.ZIndex = 1000
 coordFrame.Visible = false
 coordFrame.Parent = screenGui
 
 local uicornerCoord = Instance.new("UICorner")
-uicornerCoord.CornerRadius = UDim.new(0, 5)
+uicornerCoord.CornerRadius = UDim.new(0, 8)
 uicornerCoord.Parent = coordFrame
 
+local coordTitle = Instance.new("TextLabel")
+coordTitle.Size = UDim2.new(1, 0, 0, 15)
+coordTitle.Position = UDim2.new(0, 0, 0, 2)
+coordTitle.BackgroundTransparency = 1
+coordTitle.Text = "Coordenadas"
+coordTitle.TextColor3 = Color3.fromRGB(140, 140, 140)
+coordTitle.TextSize = 14 -- Aumentado de 10 para 14
+coordTitle.Font = Enum.Font.SourceSansBold
+coordTitle.ZIndex = 1001
+coordTitle.Parent = coordFrame
+
 local coordLabel = Instance.new("TextLabel")
-coordLabel.Size = UDim2.new(1, -10, 1, -10)
-coordLabel.Position = UDim2.new(0, 5, 0, 5)
+coordLabel.Size = UDim2.new(1, -10, 0, 25)
+coordLabel.Position = UDim2.new(0, 5, 0, 17)
 coordLabel.BackgroundTransparency = 1
-coordLabel.Text = "X 0.0 | Y 0.0 | Z 0.0"
+coordLabel.Text = "X 1234.0 Y 1234.0 Z 1234.0"
 coordLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-coordLabel.TextSize = 16
+coordLabel.TextSize = 16 -- Letras maiores
 coordLabel.Font = Enum.Font.SourceSans
+coordLabel.ZIndex = 1001
 coordLabel.Parent = coordFrame
 
+-- Coordenadas Drag
 local draggingCoord, dragInputCoord, dragStartCoord, startPosCoord
 coordFrame.InputBegan:Connect(function(input)
     if input.UserInputType == Enum.UserInputType.MouseButton1 then
@@ -352,73 +673,258 @@ UserInputService.InputChanged:Connect(function(input)
     end
 end)
 
--- Toggle Coordenadas with Enhanced Update
-local isCoordActive = false
-coordenadasToggle.MouseButton1Click:Connect(function()
-    isCoordActive = not isCoordActive
-    coordenadasToggle.BackgroundColor3 = isCoordActive and Color3.fromRGB(0, 120, 255) or Color3.fromRGB(60, 60, 60)
-    coordFrame.Visible = isCoordActive
-    if isCoordActive then
+-- Toggle Functions
+local function updateCoordenadasToggle(active)
+    isCoordActive = active
+    coordFrame.Visible = active
+    
+    local switchColor = active and mainColor or Color3.fromRGB(80, 80, 80)
+    local knobPos = active and UDim2.new(1, -20, 0, 2) or UDim2.new(0, 2, 0, 2)
+    
+    createTween(coordenadasSwitch, {BackgroundColor3 = switchColor}, 0.3):Play()
+    createTween(coordenadasKnob, {Position = knobPos}, 0.3):Play()
+    
+    if active then
         spawn(function()
-            while isCoordActive do
-                local character = player.Character
+            while isCoordActive and coordFrame.Parent do
+                local character = LocalPlayer.Character
                 if character and character:FindFirstChild("HumanoidRootPart") then
                     local rootPart = character.HumanoidRootPart
                     local xPos = string.format("%.1f", rootPart.Position.X)
                     local yPos = string.format("%.1f", rootPart.Position.Y)
                     local zPos = string.format("%.1f", rootPart.Position.Z)
-                    coordLabel.Text = "X " .. xPos .. " | Y " .. yPos .. " | Z " .. zPos
-                    -- Smooth positioning adjustment
-                    local targetPos = UDim2.new(0, 10, 1, -60)
-                    local tween = TweenService:Create(coordFrame, TweenInfo.new(0.1), {Position = targetPos})
-                    tween:Play()
+                    coordLabel.Text = "X " .. xPos .. " Y " .. yPos .. " Z " .. zPos
                 end
-                wait(0.05) -- Faster update rate for smoother experience
+                wait(0.1)
             end
+        end)
+    end
+end
+
+local function updateTransparencyToggle(active)
+    isTransparent = active
+    
+    local switchColor = active and mainColor or Color3.fromRGB(80, 80, 80)
+    local knobPos = active and UDim2.new(1, -20, 0, 2) or UDim2.new(0, 2, 0, 2)
+    
+    createTween(transparencySwitch, {BackgroundColor3 = switchColor}, 0.3):Play()
+    createTween(transparencyKnob, {Position = knobPos}, 0.3):Play()
+    
+    -- Apply transparency to all UI elements
+    local transparency = active and 0.4 or 0
+    createTween(mainFrame, {BackgroundTransparency = transparency}, 0.3):Play()
+    createTween(searchBar, {BackgroundTransparency = transparency}, 0.3):Play()
+    createTween(coordFrame, {BackgroundTransparency = transparency}, 0.3):Play()
+    
+    -- Apply transparency to buttons
+    for _, button in pairs({infiniteYieldButton, simpleSpyButton, dexExplorerButton, remoteFinderV2Button, keybindToggle}) do
+        createTween(button, {BackgroundTransparency = transparency}, 0.3):Play()
+    end
+    
+    -- Apply transparency to toggles
+    createTween(coordenadasToggle, {BackgroundTransparency = transparency}, 0.3):Play()
+    createTween(transparencyToggle, {BackgroundTransparency = transparency}, 0.3):Play()
+    createTween(colorDropdown, {BackgroundTransparency = transparency}, 0.3):Play()
+    
+    -- Apply transparency to tabs
+    createTween(tab1, {BackgroundTransparency = transparency}, 0.3):Play()
+    createTween(tab2, {BackgroundTransparency = transparency}, 0.3):Play()
+end
+
+-- Button click events for toggles
+coordenadasButton.MouseButton1Click:Connect(function()
+    updateCoordenadasToggle(not isCoordActive)
+end)
+
+transparencyButton.MouseButton1Click:Connect(function()
+    updateTransparencyToggle(not isTransparent)
+end)
+
+-- Button Debounce System
+local buttonDebounce = {}
+
+local function setupButtonDebounce(button, callback)
+    buttonDebounce[button] = false
+    button.MouseButton1Click:Connect(function()
+        if not buttonDebounce[button] then
+            buttonDebounce[button] = true
+            local success, err = pcall(callback)
+            if not success then
+                warn("Button " .. button.Text .. " failed: " .. tostring(err))
+            end
+            wait(0.5)
+            buttonDebounce[button] = false
+        end
+    end)
+end
+
+-- Fixed Category Switching System
+local currentTab = 1
+
+local function showTab(tabNum)
+    currentTab = tabNum
+    
+    -- Store original buttons for category 1
+    local category1Buttons = {infiniteYieldButton, simpleSpyButton, dexExplorerButton, remoteFinderV2Button, coordenadasToggle}
+    local category2Buttons = {keybindToggle, transparencyToggle, colorDropdown}
+    
+    -- Hide all buttons first
+    for _, btn in pairs(category1Buttons) do
+        btn.Visible = false
+    end
+    for _, btn in pairs(category2Buttons) do
+        btn.Visible = false
+    end
+    
+    -- Show search bar only for category 1 (Home)
+    searchBar.Visible = (tabNum == 1)
+    
+    if tabNum == 1 then
+        -- Show category 1 buttons with search filter
+        local searchText = searchBar.Text:lower()
+        for _, btn in pairs(category1Buttons) do
+            local buttonText = ""
+            if btn == coordenadasToggle then
+                buttonText = "coordenadas"
+            else
+                buttonText = btn.Text:lower()
+            end
+            btn.Visible = (searchText == "" or buttonText:find(searchText))
+        end
+    else
+        -- Show category 2 buttons (Settings) - ordem correta
+        for _, btn in pairs(category2Buttons) do
+            btn.Visible = true
+        end
+    end
+    
+    -- Update tab colors
+    tab1.BackgroundColor3 = tabNum == 1 and mainColor or Color3.fromRGB(50, 50, 50)
+    tab2.BackgroundColor3 = tabNum == 2 and mainColor or Color3.fromRGB(50, 50, 50)
+    
+    -- Update canvas size
+    wait(0.1) -- Wait for layout update
+    scrollingFrame.CanvasSize = UDim2.new(0, 0, 0, math.max(uiListLayout.AbsoluteContentSize.Y + 20, 200))
+end
+
+-- Tab click events
+tab1.MouseButton1Click:Connect(function() 
+    showTab(1) 
+end)
+
+tab2.MouseButton1Click:Connect(function() 
+    showTab(2) 
+end)
+
+-- Fixed search functionality
+local searchConnection
+searchBar.Changed:Connect(function(property)
+    if property == "Text" and currentTab == 1 then
+        if searchConnection then
+            searchConnection:Disconnect()
+        end
+        searchConnection = game:GetService("RunService").Heartbeat:Connect(function()
+            searchConnection:Disconnect()
+            showTab(1)
         end)
     end
 end)
 
--- Close Animation with Button Destruction
-closeButton.MouseButton1Click:Connect(function()
-    local closeTween = createFadeTween(mainFrame, 1, 0.3)
+-- Script Loading Functions
+setupButtonDebounce(infiniteYieldButton, function()
+    local success, result = pcall(function()
+        return loadstring(game:HttpGet("https://raw.githubusercontent.com/EdgeIY/infiniteyield/master/source"))()
+    end)
+    if not success then
+        warn("Infinite Yield failed to load: " .. tostring(result))
+    end
+end)
+
+setupButtonDebounce(simpleSpyButton, function()
+    local success, result = pcall(function()
+        return loadstring(game:HttpGet("https://raw.githubusercontent.com/78n/SimpleSpy/main/SimpleSpySource.lua"))()
+    end)
+    if not success then
+        warn("Simple Spy failed to load: " .. tostring(result))
+    end
+end)
+
+setupButtonDebounce(dexExplorerButton, function()
+    local success, result = pcall(function()
+        return loadstring(game:HttpGet("https://raw.githubusercontent.com/infyiff/backup/main/dex.lua"))()
+    end)
+    if not success then
+        warn("Dex Explorer failed to load: " .. tostring(result))
+    end
+end)
+
+setupButtonDebounce(remoteFinderV2Button, function()
+    local success, result = pcall(function()
+        return loadstring(game:HttpGet("https://raw.githubusercontent.com/mxx3x/Remote-Finder-v2/refs/heads/main/Remote%20Finder%20v2"))()
+    end)
+    if not success then
+        warn("Remote Finder 2 failed to load: " .. tostring(result))
+    end
+end)
+
+-- Color Update Function - Agora Infinite Yield muda de cor também
+function updateAllColors(newColor)
+    mainColor = newColor
+    
+    -- Update ALL category 1 buttons (incluindo Infinite Yield)
+    createTween(infiniteYieldButton, {BackgroundColor3 = newColor}, 0.3):Play()
+    createTween(simpleSpyButton, {BackgroundColor3 = newColor}, 0.3):Play()
+    createTween(dexExplorerButton, {BackgroundColor3 = newColor}, 0.3):Play()
+    createTween(remoteFinderV2Button, {BackgroundColor3 = newColor}, 0.3):Play()
+    
+    -- Update active toggles
+    if isCoordActive then
+        createTween(coordenadasSwitch, {BackgroundColor3 = newColor}, 0.3):Play()
+    end
+    if isTransparent then
+        createTween(transparencySwitch, {BackgroundColor3 = newColor}, 0.3):Play()
+    end
+    
+    -- Update active tab
+    if currentTab == 1 then
+        createTween(tab1, {BackgroundColor3 = newColor}, 0.3):Play()
+    else
+        createTween(tab2, {BackgroundColor3 = newColor}, 0.3):Play()
+    end
+    
+    -- Update loading elements
+    createTween(loadingTitle, {TextColor3 = newColor}, 0.3):Play()
+    createTween(loadingProgress, {BackgroundColor3 = newColor}, 0.3):Play()
+end
+
+-- Close Button with proper cleanup
+setupButtonDebounce(closeButton, function()
+    local closeTween = createTween(mainFrame, {Size = UDim2.new(0, 0, 0, 0)}, 0.4, Enum.EasingStyle.Back)
     closeTween:Play()
     
-    -- Destroy title and buttons first
-    title:Destroy()
-    infiniteYieldButton:Destroy()
-    simpleSpyButton:Destroy()
-    coordenadasToggle:Destroy()
-    remoteFinderButton:Destroy()
-    dexExplorerButton:Destroy()
-    remoteFinderV2Button:Destroy()
-    keybindToggle:Destroy()
-    tab1:Destroy()
-    tab2:Destroy()
-    closeButton:Destroy()
-    
     closeTween.Completed:Wait()
-    mainFrame:Destroy()
-    screenGui:Destroy()
+    
+    -- Cleanup
+    if isCoordActive then
+        isCoordActive = false
+        if coordFrame then
+            coordFrame:Destroy()
+        end
+    end
+    
+    if screenGui then
+        screenGui:Destroy()
+    end
 end)
 
--- Button Functions
-infiniteYieldButton.MouseButton1Click:Connect(function()
-    loadstring(game:HttpGet("https://raw.githubusercontent.com/EdgeIY/infiniteyield/master/source"))()
+-- Handle Player Death
+LocalPlayer.CharacterAdded:Connect(function()
+    if screenGui and screenGui.Parent then
+        screenGui.Enabled = true
+    end
 end)
 
-simpleSpyButton.MouseButton1Click:Connect(function()
-    loadstring(game:HttpGet("https://raw.githubusercontent.com/78n/SimpleSpy/main/SimpleSpySource.lua"))()
-end)
-
-remoteFinderButton.MouseButton1Click:Connect(function()
-    loadstring(game:HttpGet("https://raw.githubusercontent.com/RayyyFirst/Main/refs/heads/main/RatwareRemoteFinder",true))()
-end)
-
-dexExplorerButton.MouseButton1Click:Connect(function()
-    loadstring(game:HttpGet("https://raw.githubusercontent.com/infyiff/backup/main/dex.lua"))()
-end)
-
-remoteFinderV2Button.MouseButton1Click:Connect(function()
-    loadstring(game:HttpGet("https://raw.githubusercontent.com/mxx3x/Remote-Finder-v2/refs/heads/main/Remote%20Finder%20v2"))()
-end)
+-- Initialize GUI
+wait(0.2)
+showTab(1)
+showMainGui()
